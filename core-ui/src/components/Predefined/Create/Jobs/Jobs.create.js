@@ -52,6 +52,7 @@ function JobsCreate({
       formElementRef={formElementRef}
       presets={createJobPresets(namespace, t)}
       createUrl={resourceUrl}
+      // onlyYaml
     >
       <K8sNameField
         propertyPath="$.metadata.name"
