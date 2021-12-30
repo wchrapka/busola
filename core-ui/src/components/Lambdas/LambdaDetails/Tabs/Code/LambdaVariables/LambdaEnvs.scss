@@ -27,11 +27,11 @@
     display: inline-block;
     color: transparent;
     text-shadow: 0 0 10px #000;
-    transition: color .1s;
+    transition: color 0.1s;
   }
 
   .lambda-variable {
-  display: inline-block;
+    display: inline-block;
   }
 }
 
@@ -58,12 +58,12 @@
       }
     }
 
-    &.collapse-content {    
+    &.collapse-content {
       td {
         padding-top: 0;
         padding-right: 8px;
       }
-  
+
       .fd-form-message {
         padding-top: 4px;
         padding-bottom: 4px;
