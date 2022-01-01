@@ -120,7 +120,7 @@ function Resources({
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [activeResource, setActiveResource] = useState(null);
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false); //true);
   const {
     setEditedYaml: setEditedSpec,
     closeEditor,
