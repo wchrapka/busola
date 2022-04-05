@@ -1,27 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { Graphviz } from 'graphviz-react';
 
-import { ErrorBoundary } from 'shared/components/ErrorBoundary/ErrorBoundary';
 import { navigateToResource } from 'shared/hooks/navigate';
 import { useMicrofrontendContext } from 'shared/contexts/MicrofrontendContext';
 import { useRelatedResources } from 'shared/components/ResourceGraph/useRelatedResources';
 import { useIntersectionObserver } from 'shared/hooks/useIntersectionObserver';
 import { buildGraph } from 'shared/components/ResourceGraph/buildGraph';
 import { Spinner } from 'shared/components/Spinner/Spinner';
-import { useTranslation } from 'react-i18next';
 import { useMinWidth, TABLET } from 'hooks/useMinWidth';
-import { LayoutPanel } from 'fundamental-react';
 import { SaveGraphControls } from './SaveGraphControls';
 import './ResourceGraph.scss';
 
-function ResourceGraph({ resource, i18n, config }) {
+function ResourceGraph({ resource, config }) {
   const { features } = useMicrofrontendContext();
-  const { t } = useTranslation(['translation'], { i18n });
   const [dotSrc, setDotSrc] = useState('');
   const [isReady, setReady] = useState(false);
 
   const [graphEl, setGraphEl] = useState(null);
   const isTabletOrWider = useMinWidth(TABLET);
+
   const { hasBeenInView } = useIntersectionObserver(graphEl, {
     skip: !isTabletOrWider,
   });
@@ -33,7 +30,7 @@ function ResourceGraph({ resource, i18n, config }) {
     setDotSrc(buildGraph(data, config));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!setReady) return;
 
     const initEventListeners = () => {
@@ -53,10 +50,10 @@ function ResourceGraph({ resource, i18n, config }) {
               .map(x => parseFloat(x)) || [];
 
           if (nodePosition.length) {
-            // the highest x coordinate from the opposite box vertexes
+            // takes x coordinates from two opposite box vertexes
             const biggestX = Math.max(nodePosition[0], nodePosition[4]);
 
-            // these are the y coordinates of the opposite box vertexes
+            // takes y coordinates from two opposite box vertexes
             const y1 = nodePosition[1];
             const y2 = nodePosition[5];
             const smallestY = Math.min(y1, y2);
@@ -75,7 +72,6 @@ function ResourceGraph({ resource, i18n, config }) {
               'resource_status',
               `resource_status_${res.metadata.uid}`,
             );
-
             node.appendChild(rect);
           }
 
@@ -89,16 +85,20 @@ function ResourceGraph({ resource, i18n, config }) {
     };
     initEventListeners();
 
+    // adding "resource" to dependencies re-adds the status bars that are manually removed to avoid a crush
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, resource]);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
+    // manually remove added nodes before re-rendering to avoid the application crush.
+    // app crushes because they're added to the DOM directly, and they don't have keys
     return () => {
       const statuses = document.querySelectorAll('.resource_status');
-      statuses.forEach(box => {
-        box.remove();
+      statuses.forEach(bar => {
+        bar.remove();
       });
     };
+    //
   }, [resource]);
 
   const [resourcesStore, startedLoading, startLoading] = useRelatedResources({
@@ -121,51 +121,38 @@ function ResourceGraph({ resource, i18n, config }) {
     return '';
   }
 
-  const actions = !startedLoading && null;
-
-  if (!isTabletOrWider) {
-    return null;
-  }
   return (
-    <LayoutPanel
-      className="fd-margin--md resource-graph"
-      ref={node => {
-        setGraphEl(node);
-      }}
-    >
-      <LayoutPanel.Header>
-        <LayoutPanel.Head title={t('resource-graph.title')} />
-        {actions}
-      </LayoutPanel.Header>
+    <>
+      <div
+        ref={node => {
+          setGraphEl(node);
+        }}
+      />
       {startedLoading && dotSrc ? (
-        <LayoutPanel.Body>
-          <ErrorBoundary i18n={i18n} customMessage={t('resource-graph.error')}>
-            <div id="graph-area">
-              <Graphviz
-                dot={dotSrc}
-                // https://github.com/magjac/d3-graphviz#selection_graphviz
-                options={{
-                  height: '100%',
-                  width: '100%',
-                  zoom: isReady, // if always true, then the graph will jump on first pan or zoom
-                  useWorker: false,
-                }}
-              />
-              <SaveGraphControls
-                content={dotSrc}
-                // .gv extension is preferred instead of .dot
-                name={`${resource.kind} ${resource.metadata.name}.gv`}
-                i18n={i18n}
-              />
-            </div>
-          </ErrorBoundary>
-        </LayoutPanel.Body>
+        <div id="graph-area">
+          <Graphviz
+            dot={dotSrc}
+            // https://github.com/magjac/d3-graphviz#selection_graphviz
+            options={{
+              height: '100%',
+              width: '100%',
+              zoom: isReady, // if always true, then the graph will jump on first pan or zoom
+              useWorker: false,
+            }}
+          />
+          <SaveGraphControls
+            content={dotSrc}
+            // .gv extension is preferred instead of .dot
+            name={`${resource.kind} ${resource.metadata.name}.gv`}
+          />
+        </div>
       ) : (
         <div className="loader">
           <Spinner />
         </div>
       )}
-    </LayoutPanel>
+    </>
   );
 }
+
 export default ResourceGraph;

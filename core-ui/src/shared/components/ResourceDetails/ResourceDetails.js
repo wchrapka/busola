@@ -27,6 +27,7 @@ import { useWindowTitle } from 'shared/hooks/useWindowTitle';
 import { useProtectedResources } from 'shared/hooks/useProtectedResources';
 import { useDeleteResource } from 'shared/hooks/useDeleteResource';
 import { ModalWithForm } from 'shared/components/ModalWithForm/ModalWithForm';
+import ResourceGraphWrapper from 'shared/components/ResourceGraph/ResourceGraphWrapper';
 
 // This component is loaded after the page mounts.
 // Don't try to load it on scroll. It was tested.
@@ -312,15 +313,15 @@ function Resource({
       <DeleteMessageBox resource={resource} resourceUrl={resourceUrl} />
       {customComponents.map(component => component(resource, resourceUrl))}
       {children}
-      {resourceGraphConfig?.[resource.kind] && (
-        <Suspense fallback={<Spinner />}>
-          <ResourceGraph
-            resource={resource}
-            i18n={i18n}
-            config={resourceGraphConfig}
-          />
-        </Suspense>
-      )}
+      <ResourceGraphWrapper
+        resourceGraphConfig={resourceGraphConfig}
+        resource={resource}
+      />
+      {/*{resourceGraphConfig?.[resource.kind] && (*/}
+      {/*  <Suspense fallback={<Spinner />}>*/}
+      {/*    <ResourceGraph resource={resource} config={resourceGraphConfig} />*/}
+      {/*  </Suspense>*/}
+      {/*)}*/}
     </>
   );
 }
