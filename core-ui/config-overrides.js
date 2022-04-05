@@ -1,4 +1,6 @@
 // this overrides configs of webpack and jest. See react-app-rewired documentation for details
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
 
 const path = require('path');
 
@@ -10,6 +12,8 @@ module.exports = {
       shared: path.resolve(__dirname, 'src/shared'),
       ...config.resolve.alias,
     };
+
+    config.plugins = [...config.plugins, new BundleAnalyzerPlugin()];
 
     return config;
   },

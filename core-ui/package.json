@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
-    "react-jsonschema-form": "1.7.0"
+    "react-jsonschema-form": "1.7.0",
+    "webpack-bundle-analyzer": "^4.5.0"
   }
 }

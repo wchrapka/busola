@@ -6,6 +6,7 @@ import { LayoutPanel } from 'fundamental-react';
 import './ResourceGraph.scss';
 import { Spinner } from 'shared/components/Spinner/Spinner';
 import { ErrorBoundary } from 'shared/components/ErrorBoundary/ErrorBoundary';
+import { isEqual } from 'lodash';
 
 // This component is loaded after the page mounts.
 // Don't try to load it on scroll. It was tested.
@@ -14,33 +15,43 @@ const ResourceGraph = React.lazy(() =>
   import('../ResourceGraph/ResourceGraph'),
 );
 
-function ResourceGraphWrapper({ resourceGraphConfig, resource }) {
-  const { t, i18n } = useTranslation(['translation']);
+const ResourceGraphWrapper = React.memo(
+  ({ resourceGraphConfig, resource }) => {
+    const { t, i18n } = useTranslation(['translation']);
 
-  const isTabletOrWider = useMinWidth(TABLET);
+    const isTabletOrWider = useMinWidth(TABLET);
 
-  if (!isTabletOrWider) {
-    return null;
-  }
-  return (
-    <LayoutPanel className="fd-margin--md resource-graph">
-      <LayoutPanel.Header>
-        <LayoutPanel.Head title={t('resource-graph.title')} />
-      </LayoutPanel.Header>
-      <LayoutPanel.Body>
-        {resourceGraphConfig?.[resource.kind] && (
-          <Suspense fallback={<Spinner />}>
-            <ErrorBoundary
-              i18n={i18n}
-              customMessage={t('resource-graph.error')}
-            >
-              <ResourceGraph resource={resource} config={resourceGraphConfig} />
-            </ErrorBoundary>
-          </Suspense>
-        )}
-      </LayoutPanel.Body>
-    </LayoutPanel>
-  );
-}
+    if (!isTabletOrWider) {
+      return null;
+    }
+    return (
+      <LayoutPanel className="fd-margin--md resource-graph">
+        <LayoutPanel.Header>
+          <LayoutPanel.Head title={t('resource-graph.title')} />
+        </LayoutPanel.Header>
+        <LayoutPanel.Body>
+          {resourceGraphConfig?.[resource.kind] && (
+            <Suspense fallback={<Spinner />}>
+              <ErrorBoundary
+                i18n={i18n}
+                customMessage={t('resource-graph.error')}
+              >
+                <ResourceGraph
+                  resource={resource}
+                  config={resourceGraphConfig}
+                />
+              </ErrorBoundary>
+            </Suspense>
+          )}
+        </LayoutPanel.Body>
+      </LayoutPanel>
+    );
+  },
+  (prev, next) => {
+    if (isEqual(prev.resourceGraphConfig, next.resourceGraphConfig))
+      return true;
+    return isEqual(prev.resource, next.resource);
+  },
+);
 
 export default ResourceGraphWrapper;

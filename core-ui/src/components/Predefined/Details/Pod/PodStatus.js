@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusBadge } from 'shared/components/StatusBadge/StatusBadge';
 import { useTranslation } from 'react-i18next';
 
-const calculatePodState = pod => {
+export const calculatePodState = pod => {
   const containerStatuses = pod?.status?.containerStatuses;
   if (containerStatuses?.length > 0) {
     const waitingStatus = containerStatuses
@@ -28,7 +28,7 @@ const calculatePodState = pod => {
   return { status: pod.status?.phase || 'Unknown' };
 };
 
-const badgeType = status => {
+export const badgeType = status => {
   switch (status) {
     case 'Running':
     case 'Succeeded':

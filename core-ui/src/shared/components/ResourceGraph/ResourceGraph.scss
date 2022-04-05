@@ -68,3 +68,20 @@
     right: 10px;
   }
 }
+
+.success {
+  fill: var(--sapButton_Success_Background);
+}
+
+.error {
+  fill: var(--sapButton_Negative_Background);
+}
+.info {
+  fill: var(--sapButton_Information_Background);
+}
+
+.none {
+  display: none;
+}
+//--sapButton_Success_Background     #abe2ab
+//--sapButton_Negative_Background    #ff8888

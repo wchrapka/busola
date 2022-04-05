@@ -9,7 +9,9 @@ import { buildGraph } from 'shared/components/ResourceGraph/buildGraph';
 import { Spinner } from 'shared/components/Spinner/Spinner';
 import { useMinWidth, TABLET } from 'hooks/useMinWidth';
 import { SaveGraphControls } from './SaveGraphControls';
+
 import './ResourceGraph.scss';
+import { getStatusBarColor } from 'shared/components/ResourceGraph/setStatusBarColor';
 
 function ResourceGraph({ resource, config }) {
   const { features } = useMicrofrontendContext();
@@ -67,11 +69,13 @@ function ResourceGraph({ resource, config }) {
             rect.setAttribute('y', smallestY.toString());
             rect.setAttribute('width', '5');
             rect.setAttribute('height', rangeY.toString());
-            rect.setAttribute('fill', 'orange');
             rect.classList.add(
               'resource_status',
               `resource_status_${res.metadata.uid}`,
+              getStatusBarColor(res),
             );
+            console.log(getStatusBarColor(res));
+
             node.appendChild(rect);
           }
 
@@ -87,7 +91,7 @@ function ResourceGraph({ resource, config }) {
 
     // adding "resource" to dependencies re-adds the status bars that are manually removed to avoid a crush
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, resource]);
+  }, [isReady, resource, config]);
 
   useLayoutEffect(() => {
     // manually remove added nodes before re-rendering to avoid the application crush.
@@ -99,7 +103,7 @@ function ResourceGraph({ resource, config }) {
       });
     };
     //
-  }, [resource]);
+  }, [resource, config]);
 
   const [resourcesStore, startedLoading, startLoading] = useRelatedResources({
     resource,
