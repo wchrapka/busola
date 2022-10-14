@@ -28,6 +28,21 @@ export const createUrl = ({
   return `${namespacePrefix}/${pathSegment}/${details}`;
 };
 
+export const createKubernetesUrl = ({
+  resourceType,
+  namespace,
+  resourceName,
+  apiGroup = '',
+  apiVersion,
+}) => {
+  const namespaceSegment = namespace ? `namespaces/${namespace}/` : '';
+  const details = resourceName || '';
+  const apiPrefix = apiGroup ? 'apis/' : 'api';
+  resourceType = pluralize(resourceType).toLowerCase();
+
+  return `${apiPrefix}${apiGroup}/${apiVersion}/${namespaceSegment}${resourceType}/${details}`;
+};
+
 const ListWrapper = ({ children, resourceType, resourceI18Key }) => {
   const props = usePrepareListProps(resourceType, resourceI18Key);
   return React.cloneElement(children, props);
