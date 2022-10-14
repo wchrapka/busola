@@ -18,10 +18,10 @@ export const createPath = (
 export const createUrl = ({
   resourceType,
   pathSegment,
-  namespace,
+  namespaced,
   resourceName,
 }) => {
-  const namespacePrefix = namespace ? `/namespaces/${namespace}` : '';
+  const namespacePrefix = namespaced ? '/namespaces/:namespaceId' : '';
   const details = resourceName || '';
   pathSegment = pathSegment || pluralize(resourceType).toLowerCase();
 
