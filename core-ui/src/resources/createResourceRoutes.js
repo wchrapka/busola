@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { Spinner } from 'shared/components/Spinner/Spinner';
 import { usePrepareDetailsProps, usePrepareListProps } from './helpers';
 import { Route } from 'react-router-dom';
+import pluralize from 'pluralize';
 
 export const createPath = (
   config = { namespaced: true, detailsView: false, pathSegment: '' },
@@ -12,6 +13,19 @@ export const createPath = (
   const details = detailsView ? '/:resourceName' : '';
 
   return `${namespacePrefix}/${pathSegment}${details}`;
+};
+
+export const createUrl = ({
+  resourceType,
+  pathSegment,
+  namespace,
+  resourceName,
+}) => {
+  const namespacePrefix = namespace ? `/namespaces/${namespace}` : '';
+  const details = resourceName || '';
+  pathSegment = pathSegment || pluralize(resourceType).toLowerCase();
+
+  return `${namespacePrefix}/${pathSegment}/${details}`;
 };
 
 const ListWrapper = ({ children, resourceType, resourceI18Key }) => {
