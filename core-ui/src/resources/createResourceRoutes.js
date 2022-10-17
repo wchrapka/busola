@@ -3,6 +3,7 @@ import { Spinner } from 'shared/components/Spinner/Spinner';
 import { usePrepareDetailsProps, usePrepareListProps } from './helpers';
 import { Route } from 'react-router-dom';
 import pluralize from 'pluralize';
+import LuigiClient from '@luigi-project/client';
 
 export const createPath = (
   config = { namespaced: true, detailsView: false, pathSegment: '' },
@@ -14,6 +15,14 @@ export const createPath = (
 
   return `${namespacePrefix}/${pathSegment}${details}`;
 };
+
+function luigiNavigate(resource) {
+  const path = createUrl(resource);
+
+  LuigiClient.linkManager()
+    .fromContext('cluster')
+    .navigate(path);
+}
 
 export const createUrl = ({
   resourceType,
